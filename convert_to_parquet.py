@@ -6,16 +6,30 @@ import time
 CSV_PATH = "data/raw/games.csv"
 PARQUET_PATH = "data/raw/games.parquet"
 
+# Nomes CORRETOS das 40 colunas (o header original tem 39)
+CORRECT_COLUMNS = [
+    'AppID', 'Name', 'Release date', 'Estimated owners', 'Peak CCU',
+    'Required age', 'Price', 'Discount', 'DLC count', 
+    'About the game', 'Supported languages', 'Full audio languages',
+    'Reviews', 'Header image', 'Website', 'Support url', 'Support email',
+    'Windows', 'Mac', 'Linux', 'Metacritic score', 'Metacritic url',
+    'User score', 'Positive', 'Negative', 'Score rank', 'Achievements',
+    'Recommendations', 'Notes', 'Average playtime forever',
+    'Average playtime two weeks', 'Median playtime forever',
+    'Median playtime two weeks', 'Developers', 'Publishers',
+    'Categories', 'Genres', 'Tags', 'Screenshots', 'Movies'
+]
+
 def convert():
     if not os.path.exists(CSV_PATH):
         print(f"❌ Erro: O arquivo {CSV_PATH} não foi encontrado!")
         return
 
-    print(f"⏳ Lendo CSV pesado ({os.path.getsize(CSV_PATH) / (1024*1024):.2f} MB)...")
+    print(f"⏳ Lendo CSV pesado ({os.path.getsize(CSV_PATH) / (1024*1024):.2f} MB) com correção de colunas...")
     start_time = time.time()
     
-    # Lendo o CSV (usando o fix das 40 colunas se necessário, mas para conversão simples o pandas costuma lidar bem se as aspas estiverem certas)
-    df = pd.read_csv(CSV_PATH, low_memory=False)
+    # Lendo o CSV com a estrutura CORRIGIDA
+    df = pd.read_csv(CSV_PATH, header=0, names=CORRECT_COLUMNS, low_memory=False)
     
     print(f"📦 Convertendo para Parquet...")
     df.to_parquet(PARQUET_PATH, compression='snappy', index=False)
