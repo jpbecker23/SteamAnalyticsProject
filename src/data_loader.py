@@ -40,13 +40,23 @@ def load_data(file_path):
         return pd.read_csv(file_path, header=0, names=CORRECT_COLUMNS)
 
     # 3. Fallback para Google Drive (Remoto)
-    # Busca em st.secrets (Nuvem) ou os.getenv (.env local)
     drive_id = st.secrets.get("GOOGLE_DRIVE_ID") if "GOOGLE_DRIVE_ID" in st.secrets else os.getenv("GOOGLE_DRIVE_ID")
     
     if drive_id and drive_id != "COLE_O_ID_AQUI":
         drive_url = f'https://drive.google.com/uc?export=download&id={drive_id}'
-        st.info("🌐 Arquivo local não encontrado. Carregando dados do Google Drive...")
-        return pd.read_csv(drive_url, header=0, names=CORRECT_COLUMNS)
+        st.info("🌐 Arquivo local não encontrado. Carregando dados do Google Drive... (Isso pode levar alguns segundos)")
+        
+        # O Pandas é esperto: ele detecta se o que vem da URL é parquet ou csv pela estrutura do dado.
+        # Mas para garantir, tentamos Parquet primeiro (devido à nossa recomendação de performance).
+        try:
+            return pd.read_parquet(drive_url)
+        except Exception:
+            # Se falhar Parquet (ex: se você subiu um CSV), tentamos CSV
+            try:
+                return pd.read_csv(drive_url, header=0, names=CORRECT_COLUMNS)
+            except Exception as e:
+                st.error(f"❌ Erro ao processar o arquivo do Google Drive: {e}")
+                st.info("💡 Verifique se o link do arquivo no Drive está como 'Qualquer pessoa com o link pode visualizar'.")
+                return None
     
-    # Se nada funcionar
     return None
