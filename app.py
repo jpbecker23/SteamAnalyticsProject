@@ -1,7 +1,7 @@
 import streamlit as st
-import plotly.express as px
 from src.data_loader import load_data
 from src.data_cleaner import clean_steam_data
+from src.charts import plot_top_popular, plot_price_vs_rating
 import os
 
 # Configuração da página
@@ -20,7 +20,6 @@ if os.path.exists(DATA_PATH):
     st.title("🎮 Steam Analytics Dashboard")
     st.markdown("---")
 
-
     # Sidebar para filtros
     st.sidebar.header("Filtros do Dashboard")
     
@@ -34,6 +33,10 @@ if os.path.exists(DATA_PATH):
     max_price = float(df['Price'].max())
     price_range = st.sidebar.slider("Faixa de Preço (US$)", 0.0, max_price, (0.0, 100.0 if max_price > 100 else max_price))
     
+    # Filtro de Gêneros (Multiselect)
+    all_genres = sorted(df['Main_Genre'].unique().tolist())
+    selected_genres = st.sidebar.multiselect("Filtrar por Gêneros", all_genres, default=[])
+
     # Aplicando Filtros
     df_filtered = df[
         (df['Price'] >= price_range[0]) & 
@@ -41,6 +44,9 @@ if os.path.exists(DATA_PATH):
         (df['Release_Year'] >= year_range[0]) &
         (df['Release_Year'] <= year_range[1])
     ]
+    
+    if selected_genres:
+        df_filtered = df_filtered[df_filtered['Main_Genre'].isin(selected_genres)]
 
     # KPI Cards Dinâmicos
     col1, col2, col3 = st.columns(3)
@@ -53,60 +59,23 @@ if os.path.exists(DATA_PATH):
 
     st.markdown("---")
 
-    # Layout de Gráficos
-    col_g1, col_g2 = st.columns(2)
+    # Navegação por Abas (Tabs)
+    tab1, tab2, tab3 = st.tabs(["🔥 Panorama Geral", "💰 Análise de Preços", "🔍 Explorador de Dados"])
 
-    with col_g1:
-        st.subheader("🔥 Top 20 Jogos Mais Populares")
-        # Usando Total_Reviews como proxy de popularidade
-        top_20 = df_filtered.nlargest(20, 'Total_Reviews').sort_values('Total_Reviews', ascending=True)
-        
-        fig_pop = px.bar(
-            top_20, 
-            x='Total_Reviews', 
-            y='Name', 
-            orientation='h',
-            color='Review_Score',
-            color_continuous_scale='Viridis',
-            text='Total_Reviews', 
-            labels={'Total_Reviews': 'Total de Avaliações', 'Name': 'Nome do Jogo', 'Review_Score': 'Pontuação (%)'},
-            template='plotly_dark',
-            hover_data={
-                'Name': False, 
-                'Total_Reviews': ':,', 
-                'Review_Score': ':.1f'
-            }
-        )
-        
-        # Melhorias visuais
-        fig_pop.update_traces(texttemplate='%{text:.2s}', textposition='outside')
-        fig_pop.update_layout(
-            yaxis={'title': ''}, 
-            margin=dict(l=200), 
-            height=600,
-            coloraxis_colorbar=dict(title="Score %")
-        )
-        st.plotly_chart(fig_pop, width='stretch')
+    with tab1:
+        st.plotly_chart(plot_top_popular(df_filtered), width='stretch')
 
-    with col_g2:
-        st.subheader("💰 Relação Preço vs Avaliação")
-        # Amostragem para performance
-        df_sample = df_filtered.sample(min(5000, len(df_filtered))) if len(df_filtered) > 5000 else df_filtered
-        
-        fig_price = px.scatter(
-            df_sample,
-            x='Price',
-            y='Review_Score',
-            color='Price_Category',
-            size='Total_Reviews',
-            hover_name='Name',
-            hover_data={'Price': ':.2f', 'Review_Score': ':.1f', 'Total_Reviews': ':,'},
-            labels={'Price': 'Preço (US$)', 'Review_Score': 'Pontuação (%)', 'Price_Category': 'Categoria'},
-            template='plotly_dark',
-            color_discrete_sequence=px.colors.qualitative.Pastel
+    with tab2:
+        st.plotly_chart(plot_price_vs_rating(df_filtered), width='stretch')
+        st.info("💡 Dica: No gráfico acima, o tamanho dos círculos representa a popularidade total do jogo.")
+
+    with tab3:
+        st.subheader("Visualização dos Dados Filtrados")
+        st.dataframe(
+            df_filtered[['Name', 'Release date', 'Price', 'Total_Reviews', 'Review_Score', 'Main_Genre']],
+            use_container_width=True,
+            hide_index=True
         )
-        fig_price.update_layout(height=600)
-        st.plotly_chart(fig_price, width='stretch')
 
 else:
     st.error("❌ Arquivo data/raw/games.csv não encontrado!")
