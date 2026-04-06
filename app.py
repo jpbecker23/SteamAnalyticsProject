@@ -4,41 +4,31 @@ from src.data_cleaner import clean_steam_data
 from src.charts import plot_top_popular, plot_price_vs_rating
 import os
 
-# Configuração da página
 st.set_page_config(page_title="Steam Analytics Dashboard", page_icon="🎮", layout="wide")
 
-# Caminho do arquivo
 DATA_PATH = "data/raw/games.csv"
 
-# Carregamento e Limpeza
-# Chamada única: a função load_data já sabe buscar no local ou no Drive
 df_raw = load_data(DATA_PATH)
 
 if df_raw is not None:
     df = clean_steam_data(df_raw)
     
-    # Título Principal
     st.title("🎮 Steam Analytics Dashboard")
     st.markdown("---")
 
-    # Sidebar para filtros
     st.sidebar.header("Filtros do Dashboard")
     
-    # Filtro de Ano de Lançamento
     valid_years = df[df['Release_Year'] > 0]['Release_Year']
     min_year = int(valid_years.min()) if not valid_years.empty else 1997
     max_year = int(df['Release_Year'].max()) if not df['Release_Year'].empty else 2025
     year_range = st.sidebar.slider("Ano de Lançamento", min_year, max_year, (2010, max_year))
     
-    # Filtro de Faixa de Preço
     max_price = float(df['Price'].max())
     price_range = st.sidebar.slider("Faixa de Preço (US$)", 0.0, max_price, (0.0, 100.0 if max_price > 100 else max_price))
     
-    # Filtro de Gêneros (Multiselect)
     all_genres = sorted(df['Main_Genre'].unique().tolist())
     selected_genres = st.sidebar.multiselect("Filtrar por Gêneros", all_genres, default=[])
 
-    # Aplicando Filtros
     df_filtered = df[
         (df['Price'] >= price_range[0]) & 
         (df['Price'] <= price_range[1]) &
@@ -49,7 +39,6 @@ if df_raw is not None:
     if selected_genres:
         df_filtered = df_filtered[df_filtered['Main_Genre'].isin(selected_genres)]
 
-    # KPI Cards Dinâmicos
     col1, col2, col3 = st.columns(3)
     with col1:
         st.metric("Total de Jogos", f"{len(df_filtered):,}")
@@ -60,7 +49,6 @@ if df_raw is not None:
 
     st.markdown("---")
 
-    # Navegação por Abas (Tabs)
     tab1, tab2, tab3 = st.tabs(["🔥 Panorama Geral", "💰 Análise de Preços", "🔍 Explorador de Dados"])
 
     with tab1:
