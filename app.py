@@ -6,7 +6,7 @@ import os
 
 st.set_page_config(page_title="Steam Analytics Dashboard", page_icon="🎮", layout="wide")
 
-DATA_PATH = "data/raw/games.csv"
+DATA_PATH = "data/raw/games_slim.parquet"
 
 df_raw = load_data(DATA_PATH)
 
