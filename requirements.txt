@@ -3,3 +3,5 @@ numpy
 plotly
 streamlit
 watchdog
+python-dotenv
+pyarrow
