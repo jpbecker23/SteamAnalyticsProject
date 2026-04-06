@@ -11,9 +11,10 @@ st.set_page_config(page_title="Steam Analytics Dashboard", page_icon="🎮", lay
 DATA_PATH = "data/raw/games.csv"
 
 # Carregamento e Limpeza
-if os.path.exists(DATA_PATH):
-    # Carregando dados
-    df_raw = load_data(DATA_PATH)
+# Chamada única: a função load_data já sabe buscar no local ou no Drive
+df_raw = load_data(DATA_PATH)
+
+if df_raw is not None:
     df = clean_steam_data(df_raw)
     
     # Título Principal
@@ -78,5 +79,5 @@ if os.path.exists(DATA_PATH):
         )
 
 else:
-    st.error("❌ Arquivo data/raw/games.csv não encontrado!")
-    st.info("Por favor, coloque o arquivo baixado do Kaggle na pasta correta.")
+    st.error("❌ Dados não encontrados!")
+    st.info("O arquivo local 'data/raw/games.csv' não foi detectado e o Google Drive ID não foi configurado corretamente nos Secrets do Streamlit Cloud.")
