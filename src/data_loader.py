@@ -3,10 +3,8 @@ import streamlit as st
 import os
 from dotenv import load_dotenv
 
-# Carrega variáveis de ambiente do arquivo .env (local)
 load_dotenv()
 
-# Nomes CORRETOS das 40 colunas (o header original tem 39 porque juntou "Discount" e "DLC count")
 CORRECT_COLUMNS = [
     'AppID', 'Name', 'Release date', 'Estimated owners', 'Peak CCU',
     'Required age', 'Price', 'Discount', 'DLC count', 
@@ -28,30 +26,24 @@ def load_data(file_path):
     2. Se não encontrar localmente, tenta baixar do Google Drive via URL segura.
     """
     
-    # 1. Tentar ler Parquet local (muito mais rápido, se existir)
     parquet_path = file_path.replace(".csv", ".parquet")
     if os.path.exists(parquet_path):
         print(f"✅ Carregando arquivo PARQUET local: {parquet_path}")
         return pd.read_parquet(parquet_path)
 
-    # 2. Tentar ler CSV local
     if os.path.exists(file_path):
         print(f"📦 Carregando arquivo CSV local: {file_path}")
         return pd.read_csv(file_path, header=0, names=CORRECT_COLUMNS)
 
-    # 3. Fallback para Google Drive (Remoto)
     drive_id = st.secrets.get("GOOGLE_DRIVE_ID") if "GOOGLE_DRIVE_ID" in st.secrets else os.getenv("GOOGLE_DRIVE_ID")
     
     if drive_id and drive_id != "COLE_O_ID_AQUI":
         drive_url = f'https://drive.google.com/uc?export=download&id={drive_id}'
         st.info("🌐 Arquivo local não encontrado. Carregando dados do Google Drive... (Isso pode levar alguns segundos)")
         
-        # O Pandas é esperto: ele detecta se o que vem da URL é parquet ou csv pela estrutura do dado.
-        # Mas para garantir, tentamos Parquet primeiro (devido à nossa recomendação de performance).
         try:
             return pd.read_parquet(drive_url)
         except Exception:
-            # Se falhar Parquet (ex: se você subiu um CSV), tentamos CSV
             try:
                 return pd.read_csv(drive_url, header=0, names=CORRECT_COLUMNS)
             except Exception as e:

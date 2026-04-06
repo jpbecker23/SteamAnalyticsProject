@@ -4,7 +4,6 @@ def plot_top_popular(df):
     """
     Gera o gráfico de barras dos 20 jogos mais populares.
     """
-    # Usando Total_Reviews como proxy de popularidade
     top_20 = df.nlargest(20, 'Total_Reviews').sort_values('Total_Reviews', ascending=True)
     
     fig = px.bar(
@@ -24,7 +23,6 @@ def plot_top_popular(df):
         }
     )
     
-    # Melhorias visuais
     fig.update_traces(texttemplate='%{text:.2s}', textposition='outside')
     fig.update_layout(
         title="🔥 Top 20 Jogos Mais Populares",
@@ -39,7 +37,6 @@ def plot_price_vs_rating(df):
     """
     Gera o gráfico de dispersão Preço vs Avaliação.
     """
-    # Amostragem para performance
     df_sample = df.sample(min(5000, len(df))) if len(df) > 5000 else df
     
     fig = px.scatter(

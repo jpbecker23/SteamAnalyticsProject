@@ -1,16 +1,14 @@
 import pandas as pd
 import os
 
-# Caminhos
+
 INPUT_CSV = "data/raw/games.csv"
 OUTPUT_SLIM = "data/raw/games_slim.parquet"
 
-# Colunas que REALMENTE usamos no dashboard
 ESSENTIAL_COLUMNS = [
     'Name', 'Release date', 'Price', 'Positive', 'Negative', 'Genres'
 ]
 
-# Nomes CORRETOS das 40 colunas (o header original tem 39)
 CORRECT_COLUMNS = [
     'AppID', 'Name', 'Release date', 'Estimated owners', 'Peak CCU',
     'Required age', 'Price', 'Discount', 'DLC count', 
@@ -30,10 +28,8 @@ def create_slim():
         return
 
     print(f"⏳ Lendo CSV pesado com correção de colunas...")
-    # Lendo o CSV com a estrutura CORRIGIDA
     df = pd.read_csv(INPUT_CSV, header=0, names=CORRECT_COLUMNS, low_memory=False)
     
-    # Colunas que REALMENTE usamos
     df_slim = df[['Name', 'Release date', 'Price', 'Positive', 'Negative', 'Genres']].copy()
     df_slim.rename(columns={'Genres': 'Main_Genre'}, inplace=True)
     
