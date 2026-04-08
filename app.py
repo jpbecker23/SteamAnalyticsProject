@@ -13,7 +13,7 @@ df_raw = load_data(DATA_PATH)
 if df_raw is not None:
     df = clean_steam_data(df_raw)
     
-    st.title("🎮 Steam Analytics Dashboard")
+    st.title("Steam Analytics Dashboard")
     st.markdown("---")
 
     st.sidebar.header("Filtros do Dashboard")
@@ -49,14 +49,14 @@ if df_raw is not None:
 
     st.markdown("---")
 
-    tab1, tab2, tab3 = st.tabs(["🔥 Panorama Geral", "💰 Análise de Preços", "🔍 Explorador de Dados"])
+    tab1, tab2, tab3 = st.tabs(["Panorama Geral", "Análise de Preços", "Explorador de Dados"])
 
     with tab1:
         st.plotly_chart(plot_top_popular(df_filtered), width='stretch')
 
     with tab2:
         st.plotly_chart(plot_price_vs_rating(df_filtered), width='stretch')
-        st.info("💡 Dica: No gráfico acima, o tamanho dos círculos representa a popularidade total do jogo.")
+        st.info("Dica: No gráfico acima, o tamanho dos círculos representa a popularidade total do jogo.")
 
     with tab3:
         st.subheader("Visualização dos Dados Filtrados")
@@ -67,5 +67,5 @@ if df_raw is not None:
         )
 
 else:
-    st.error("❌ Dados não encontrados!")
+    st.error("Dados não encontrados!")
     st.info("O arquivo local 'data/raw/games.csv' não foi detectado e o Google Drive ID não foi configurado corretamente nos Secrets do Streamlit Cloud.")
