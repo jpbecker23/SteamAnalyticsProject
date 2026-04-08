@@ -25,7 +25,7 @@ def plot_top_popular(df):
     
     fig.update_traces(texttemplate='%{text:.2s}', textposition='outside')
     fig.update_layout(
-        title="🔥 Top 20 Jogos Mais Populares",
+        title="Top 20 Jogos Mais Populares",
         yaxis={'title': ''}, 
         margin=dict(l=200), 
         height=600,
@@ -52,7 +52,7 @@ def plot_price_vs_rating(df):
         color_discrete_sequence=px.colors.qualitative.Pastel
     )
     fig.update_layout(
-        title="💰 Relação Preço vs Avaliação (Amostra)",
+        title="Relação Preço vs Avaliação (Amostra)",
         height=600
     )
     return fig

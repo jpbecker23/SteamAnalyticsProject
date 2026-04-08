@@ -24,28 +24,28 @@ CORRECT_COLUMNS = [
 
 def create_slim():
     if not os.path.exists(INPUT_CSV):
-        print(f"❌ Erro: {INPUT_CSV} not found.")
+        print(f"Erro: {INPUT_CSV} not found.")
         return
 
-    print(f"⏳ Lendo CSV pesado com correção de colunas...")
+    print(f"Lendo CSV pesado com correção de colunas...")
     df = pd.read_csv(INPUT_CSV, header=0, names=CORRECT_COLUMNS, low_memory=False)
     
     df_slim = df[['Name', 'Release date', 'Price', 'Positive', 'Negative', 'Genres']].copy()
     df_slim.rename(columns={'Genres': 'Main_Genre'}, inplace=True)
     
-    print(f"📦 Criando versão SLIM ({len(df_slim)} jogos)...")
+    print(f"Criando versão SLIM ({len(df_slim)} jogos)...")
     df_slim.to_parquet(OUTPUT_SLIM, compression='brotli', index=False)
     
     csv_size = os.path.getsize(INPUT_CSV) / (1024*1024)
     slim_size = os.path.getsize(OUTPUT_SLIM) / (1024*1024)
     
     print("\n" + "="*30)
-    print("🚀 PERFORMANCE SLIM COMPLETA! 🚀")
-    print(f"📄 CSV Original: {csv_size:.2f} MB")
-    print(f"💎 Parquet Slim: {slim_size:.2f} MB")
-    print(f"📉 Redução de: {((1 - slim_size/csv_size) * 100):.1f}%")
+    print("PERFORMANCE SLIM COMPLETA!")
+    print(f"CSV Original: {csv_size:.2f} MB")
+    print(f"Parquet Slim: {slim_size:.2f} MB")
+    print(f"Redução de: {((1 - slim_size/csv_size) * 100):.1f}%")
     print("="*30)
-    print(f"\n✅ NOVO PASSO: Suba o arquivo '{OUTPUT_SLIM}' para o Drive e use o ID dele!")
+    print(f"\nNOVO PASSO: Suba o arquivo '{OUTPUT_SLIM}' para o Drive e use o ID dele!")
 
 if __name__ == "__main__":
     create_slim()
