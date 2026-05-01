@@ -6,7 +6,7 @@ import os
 
 st.set_page_config(page_title="Steam Analytics Dashboard", page_icon="🎮", layout="wide")
 
-DATA_PATH = "data/raw/games_slim.parquet"
+DATA_PATH = "data/raw/games.parquet"
 
 df_raw = load_data(DATA_PATH)
 
@@ -68,4 +68,4 @@ if df_raw is not None:
 
 else:
     st.error("Dados não encontrados!")
-    st.info("O arquivo local 'data/raw/games.csv' não foi detectado e o Google Drive ID não foi configurado corretamente nos Secrets do Streamlit Cloud.")
+    st.info("O arquivo local 'data/raw/games.parquet' não foi detectado e o Google Drive ID não está configurado.")

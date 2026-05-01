@@ -28,11 +28,10 @@ def convert():
     print(f"Lendo CSV pesado ({os.path.getsize(CSV_PATH) / (1024*1024):.2f} MB) com correção de colunas...")
     start_time = time.time()
     
-    # Lendo o CSV com a estrutura CORRIGIDA
     df = pd.read_csv(CSV_PATH, header=0, names=CORRECT_COLUMNS, low_memory=False)
     
     print(f"Convertendo para Parquet...")
-    df.to_parquet(PARQUET_PATH, compression='snappy', index=False)
+    df.to_parquet(PARQUET_PATH, compression='zstd', compression_level=6, index=False)
     
     end_time = time.time()
     

@@ -35,7 +35,12 @@ def load_data(file_path):
         print(f"Carregando arquivo CSV local: {file_path}")
         return pd.read_csv(file_path, header=0, names=CORRECT_COLUMNS)
 
-    drive_id = st.secrets.get("GOOGLE_DRIVE_ID") if "GOOGLE_DRIVE_ID" in st.secrets else os.getenv("GOOGLE_DRIVE_ID")
+    drive_id = os.getenv("GOOGLE_DRIVE_ID")
+    try:
+        if "GOOGLE_DRIVE_ID" in st.secrets:
+            drive_id = st.secrets["GOOGLE_DRIVE_ID"]
+    except Exception:
+        pass
     
     if drive_id and drive_id != "COLE_O_ID_AQUI":
         drive_url = f'https://drive.google.com/uc?export=download&id={drive_id}'
