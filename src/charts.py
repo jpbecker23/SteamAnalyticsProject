@@ -4,7 +4,9 @@ def plot_top_popular(df):
     """
     Gera o gráfico de barras dos 20 jogos mais populares.
     """
-    top_20 = df.nlargest(20, 'Total_Reviews').sort_values('Total_Reviews', ascending=True)
+    # Como a API já traz ordenado descendente, apenas ordenamos de forma crescente
+    # para que a barra mais longa apareça no topo do gráfico horizontal do Plotly.
+    top_20 = df.sort_values('Total_Reviews', ascending=True)
     
     fig = px.bar(
         top_20, 
@@ -37,6 +39,16 @@ def plot_price_vs_rating(df):
     """
     Gera o gráfico de dispersão Preço vs Avaliação.
     """
+    # Calcula a categoria de preços se não estiver presente nos dados vindos da API
+    if 'Price_Category' not in df.columns and 'Price' in df.columns:
+        def categorize_price(price):
+            if price == 0: return 'Gratuito'
+            elif price < 10: return 'Econômico (<$10)'
+            elif price < 30: return 'Padrão ($10-$30)'
+            else: return 'Premium (>$30)'
+        df = df.copy()
+        df['Price_Category'] = df['Price'].apply(categorize_price)
+
     df_sample = df.sample(min(5000, len(df))) if len(df) > 5000 else df
     
     fig = px.scatter(
@@ -56,3 +68,4 @@ def plot_price_vs_rating(df):
         height=600
     )
     return fig
+

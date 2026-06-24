@@ -1,8 +1,6 @@
 # Dados (Dataset pesado > 100MB)
-data/
 *.csv
 *.json
-
 
 # Ambiente Virtual
 venv/
